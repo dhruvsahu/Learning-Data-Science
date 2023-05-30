@@ -12,6 +12,8 @@ import os
 
 from src.exception import CustomException
 from src.logger import logging
+from src.utils import save_object
+# from src.components.data_transformation import DataTransformation,DataTransformationConfig
 
 @dataclass
 class DataTransformationConfig:
@@ -51,7 +53,7 @@ class DataTransformation:
 
             preprocessor = ColumnTransformer(
                 [
-                    ("num=pipepline",num_pipeline,numerical_columns)
+                    ("num=pipepline",num_pipeline,numerical_columns),
                     ("cat_pipeline",cat_pipeline,categorical_columns)
                 ]
             ) 
@@ -90,7 +92,14 @@ class DataTransformation:
             test_arr = np.c_[input_feature_test_arr,np.array(target_feature_test_df)]
 
             logging.info(f"Saved preprocessing objects")
-            
 
-        except:
-            pass
+            save_object( file_path = self.data_transformation_config.preprocessor_ob_file_path,
+                        obj=preprocessing_obj
+                           )
+
+
+            return ( train_arr,test_arr,self.data_transformation_config.preprocessor_ob_file_path )
+
+        except Exception as e:
+            raise CustomException(e,sys)
+        
